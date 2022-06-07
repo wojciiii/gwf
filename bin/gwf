@@ -20,7 +20,7 @@ if [ -z "${ARG}" ]; then
 fi
 
 # TODO: Set this based on args:
-VERBOSE=1
+VERBOSE=0
 
 verbose () {
   if [ "${VERBOSE}" -eq "1" ]; then
