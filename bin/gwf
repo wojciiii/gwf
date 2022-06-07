@@ -1,0 +1,47 @@
+#!/bin/bash
+
+# GWF - git work flow
+# (C) Michael Wojciechowski-Jensen
+
+ARG="${1}"
+
+if [ -z "${GIT_EDITOR}" ]; then
+  export GIT_EDITOR='nano -z'
+  echo "Editor set to ${GIT_EDITOR}"
+fi
+
+GITNAME=$(basename -s .git $(git config --get remote.origin.url)) || GITNAME=""
+
+if [ -z "${ARG}" ]; then
+  echo "What workflow do you want to execute?"
+  echo "Possible workflows .."
+
+  exit 1
+fi
+
+# TODO: Set this based on args:
+VERBOSE=1
+
+verbose () {
+  if [ "${VERBOSE}" -eq "1" ]; then
+    echo "${1}"
+  fi
+}
+
+if [ "${ARG}" == "pub" ]; then
+  verbose "Handling pull/rebase"
+  STATUS=1
+  verbose "Executing git pull"
+  git pull --no-edit && \
+  verbose "Executing git rebase" && \
+  git rebase && \
+  STATUS=0
+  verbose "Finished with status ${STATUS}"
+  exit ${STATUS}
+else
+  verbose "Unknown flow"
+  exit 1
+fi
+
+exit 0
+
