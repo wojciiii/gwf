@@ -14,13 +14,31 @@ GITNAME=$(basename -s .git $(git config --get remote.origin.url)) || GITNAME=""
 
 if [ -z "${ARG}" ]; then
   echo "What workflow do you want to execute?"
-  echo "Possible workflows .."
-
+  echo "Possible workflows:"
+  echo "cr <branch>  - create work branch."
+  echo "pub          - pull followed by rebase."
+  echo "th           - pull followed by rebase, take their version."
+  echo "pr           - push ready branch."
+  echo "am           - ammend last commit, edit message."
+  echo "ac           - add modified files with commit message (work branch name)."
+  echo "reb          - list ten most recent branches."
+  echo "lbr          - push local branch to remote server."
+  echo "ec <message> - add empty commit with <message>."
+  echo ""
+  echo "More advanced usecases:"
+  echo "cp <branch> <id>"
+  echo "  Create <branch>. Cherry pick <id> and commiot it."
+  echo "check"
+  echo "  Execute \${REPO_NAME}-check.sh script to execute any often executed checks prior to pushing."
+  echo "  \{REPO_NAME} is the name of the gif repository in which this tool is executed."
+  if [ ! -z "${GITNAME}" ]; then
+    echo "  For this repository the script is located in ${HOME}/.gwf/${GITNAME}-check.sh" 
+  fi
   exit 1
 fi
 
 # TODO: Set this based on args:
-VERBOSE=0
+VERBOSE=1
 
 verbose () {
   if [ "${VERBOSE}" -eq "1" ]; then
