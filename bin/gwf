@@ -46,9 +46,10 @@ verbose () {
   fi
 }
 
+STATUS=1
+
 if [ "${ARG}" == "pub" ]; then
   verbose "Handling pull/rebase"
-  STATUS=1
   verbose "Executing git pull"
   git pull --no-edit && \
   verbose "Executing git rebase" && \
@@ -56,10 +57,29 @@ if [ "${ARG}" == "pub" ]; then
   STATUS=0
   verbose "Finished with status ${STATUS}"
   exit ${STATUS}
+elif [ "${ARG}" == "th" ]; then
+  verbose "Handling pull/rebase"
+  verbose "Executing git pull"
+  git pull --no-edit && \
+  verbose "Executing git rebase" && \
+  git rebase -Xtheirs && \
+  STATUS=0
+  verbose "Finished with status ${STATUS}"
+  exit ${STATUS}
+elif [ "${ARG}" == "reb" ]; then
+  git branch --sort=committerdate|head -n10 && STATUS=0
+  exit ${STATUS}
+elif [ "${ARG}" == "ec" ]; then
+  MESSAGE="$2"
+  verbose "Adding empty commit with message ${MESSAGE}"
+  if [ -z "${MESSAGE}" ]
+    exit ${STATUS}
+  fi
+  git commit --allow-empty -m"${MESSAGE}" && STATUS=0
+  exit ${STATUS}
 else
   verbose "Unknown flow"
   exit 1
 fi
 
 exit 0
-
