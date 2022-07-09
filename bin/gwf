@@ -12,6 +12,18 @@ fi
 
 GITNAME=$(basename -s .git $(git config --get remote.origin.url)) || GITNAME=""
 
+# Obtain the name of the master branch for the current git repository:
+MASTER_NAME_=$(git symbolic-ref refs/remotes/origin/HEAD || echo "")
+MASTER_NAME=$(echo ${MASTER_NAME_##*/})
+echo "MASTER_NAME=${MASTER_NAME}"
+
+if [ -z "${MASTER_NAME}" ]; then
+  echo "Unable to find git master branch"
+  exit 1
+fi
+
+#exit 0
+
 if [ -z "${ARG}" ]; then
   echo "What workflow do you want to execute?"
   echo "Possible workflows:"
@@ -72,11 +84,29 @@ elif [ "${ARG}" == "reb" ]; then
 elif [ "${ARG}" == "ec" ]; then
   MESSAGE="$2"
   verbose "Adding empty commit with message ${MESSAGE}"
-  if [ -z "${MESSAGE}" ]
+  if [ -z "${MESSAGE}" ]; then
     exit ${STATUS}
   fi
   git commit --allow-empty -m"${MESSAGE}" && STATUS=0
   exit ${STATUS}
+elif [ "${ARG}" == "cr" ]; then
+  BRANCH="$2"
+  if [ -z "${BRANCH}" ]; then
+    echo "No branch provided."
+    exit ${STATUS}
+  fi
+  verbose "Updating local master"
+  git checkout ${MASTER_NAME} || exit ${STATUS}
+  git pull --rebase origin ${MASTER_NAME}
+
+  verbose "Creating branch ${BRANCH}"
+  git checkout -b "${BRANCH}"
+  git branch --set-upstream-to=origin/${MASTER_NAME}
+  verbose "Updating branch ${BRANCH}"
+  git pull || exit ${STATUS}
+  git rebase || exit ${STATUS}
+  STATUS=0
+  verbose "Branch creation OK"
 else
   verbose "Unknown flow"
   exit 1
