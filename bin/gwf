@@ -107,6 +107,23 @@ elif [ "${ARG}" == "cr" ]; then
   git rebase || exit ${STATUS}
   STATUS=0
   verbose "Branch creation OK"
+elif [ "${ARG}" == "lbr" ]; then
+  verbose "Pushing local branch to remote"
+  BRANCH=$(git rev-parse --abbrev-ref HEAD)  
+  if [ -z "${BRANCH}" ]; then
+    echo "No branch provided."
+    exit ${STATUS}
+  fi
+
+  if [ "${BRANCH}" == "${MASTER_NAME}" ]; then
+    echo "Not pushing master \"${MASTER_NAME}\"."
+    exit ${STATUS}
+  fi
+
+  git push origin ${BRANCH} || exit ${STATUS}
+
+  STATUS=0
+  verbose "Branch pushed"
 else
   verbose "Unknown flow"
   exit 1
