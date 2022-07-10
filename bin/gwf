@@ -107,6 +107,31 @@ elif [ "${ARG}" == "cr" ]; then
   git rebase || exit ${STATUS}
   STATUS=0
   verbose "Branch creation OK"
+elif [ "${ARG}" == "ac" ]; then
+  verbose "Adding updated files with commit message: branch name"
+  BN=$(git rev-parse --abbrev-ref HEAD)
+
+  if [ -z "${BN}" ]; then
+    echo "Empty branch name."
+    exit ${STATUS}
+  fi
+
+  if [ "${BN}" == "${MASTER_NAME}" ]; then
+    echo "Not comitting on master."
+    exit ${STATUS}
+  fi
+
+  verbose "Adding all changed files."
+  git add -u && \
+  git commit -m "${BN}" && \
+  STATUS=0
+  exit ${STATUS}
+elif [ "${ARG}" == "am" ]; then
+  verbose "Adding updated files, ammending last commit"
+  git add -u && \
+  git commit --amend && STATUS=0
+
+  exit ${STATUS}
 elif [ "${ARG}" == "lbr" ]; then
   verbose "Pushing local branch to remote"
   BRANCH=$(git rev-parse --abbrev-ref HEAD)  
