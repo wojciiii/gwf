@@ -149,6 +149,26 @@ elif [ "${ARG}" == "lbr" ]; then
 
   STATUS=0
   verbose "Branch pushed"
+elif [ "${ARG}" == "pr" ]; then
+  BRANCH=$(git rev-parse --abbrev-ref HEAD)  
+  if [ -z "${BRANCH}" ]; then
+    echo "No branch provided."
+    exit ${STATUS}
+  fi
+
+  if [ "${BRANCH}" == "${MASTER_NAME}" ]; then
+    echo "Not pushing master \"${MASTER_NAME}\"."
+    exit ${STATUS}
+  fi
+
+  verbose "Pushing branch ${BRANCH} to ready"
+  R=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9'|fold -w8|head -n1)
+  READY_BRANCH_NAME="${BRANCH}_${R}"
+  verbose "Using branch name ${READY_BRANCH_NAME}"
+  git push origin ${BRANCH}:ready/${READY_BRANCH_NAME} && \
+  STATUS=0
+  verbose "Finished with status ${STATUS}"
+  exit ${STATUS}
 else
   verbose "Unknown flow"
   exit 1
