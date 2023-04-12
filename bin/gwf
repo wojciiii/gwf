@@ -17,8 +17,14 @@ MASTER_NAME_=$(git symbolic-ref refs/remotes/origin/HEAD || echo "")
 MASTER_NAME=$(echo ${MASTER_NAME_##*/})
 echo "MASTER_NAME=${MASTER_NAME}"
 
+# Or read it from the config if provided:
+CONFIG_FILE="${HOME}/.gwf/main-branch"
+if [ -s ${CONFIG_FILE} ]; then
+  MASTER_NAME=$(cat ${CONFIG_FILE})
+fi
+
 if [ -z "${MASTER_NAME}" ]; then
-  echo "Unable to find git master branch"
+  echo "Unable to find git master branch \"${MASTER_NAME}\""
   exit 1
 fi
 
